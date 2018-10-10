@@ -26,7 +26,7 @@ Bevor das Modul aktiviert werden kann, muss es in der Datei internal/cfg/LucyAut
 
 Beispiel OpenID Connect und Intrexx Standard Authentifizierung:
 
-`
+```text
 IntrexxOAuth2
 {
         de.uplanet.lucy.server.auth.module.intrexx.IntrexxOAuth2LoginModule sufficient
@@ -39,7 +39,7 @@ IntrexxOAuth2
         de.uplanet.lucy.server.auth.module.anonymous.AnonymousLoginModule sufficient
                 debug=true;
 };
-`
+```
 
 ### Login Modul aktivieren am Beispiel Microsoft Azure AD
 
@@ -174,7 +174,7 @@ Es wird empfohlen, die Benutzerstammdaten aus dem externen Identity Provider zu 
                 auth-client-secret="CLIENT_SECRET"
                 auth-grant-type="authorization_code" auth-protocol="id_token"
                 auth-provider-login-hint="This is a hint"
-                auth-provider-prompt="none" 
+                auth-provider-prompt="none"
                 auth-pub-keys-src="https://login.microsoftonline.com/common/discovery/keys"
                 auth-redirect-url="https://localhost/test/oauth2login"
                 auth-requires-nonce="true"
