@@ -98,7 +98,7 @@ Wenn ein Benutzer nicht angemeldeter Benutzer auf das Portal zugreift, wird er v
 
 Installieren Sie das IIS Module "Url Rewrite" von Microsoft. Anschließend erstellen Sie eine neue Umleitungsregel wie hier beschrieben:
 
-http://up-download.de/up/docs/intrexx-onlinehelp/8100/de/index.html?p=helpfiles/help.2.connectoren-office-365.html#IIS-Konfiguration
+<http://up-download.de/up/docs/intrexx-onlinehelp/8100/de/index.html?p=helpfiles/help.2.connectoren-office-365.html#IIS-Konfiguration>
 
 Tragen Sie dabei im Feld "Muster" den Ausdruck `oauth2login` ein und unter "URL umschreiben" den Ausdruck `default.asp?urn:schemas-unitedplanet-de:ixservlet:name=oAuth2LoginIxServlet` ein.
 
@@ -152,7 +152,7 @@ Klickt ein Benutzer auf der Startseite auf einen der OAuth2 Anmelde-Buttons, wir
 
 ### Benutzerreplikation
 
-Es wird empfohlen, die Benutzerstammdaten aus dem externen Identity Provider zu importieren/replizieren. Im Fall von Azure AD oder ADFS ist die via LDAP möglich.
+Es wird empfohlen, die Benutzerstammdaten aus dem externen Identity Provider zu importieren/replizieren. Im Fall von Azure AD oder ADFS ist dies via LDAP möglich.
 
 ### Weiterführende Links
 
@@ -171,15 +171,15 @@ Es wird empfohlen, die Benutzerstammdaten aus dem externen Identity Provider zu 
         <provider
                 auth-access-token-url="https://login.microsoftonline.com/common/oauth2/token"
                 auth-client-id="CLIENT_ID"
-                auth-client-secret="CLIENT_SECRET" 
-                auth-grant-type="authorization_code" auth-protocol="id_token" 
-                auth-provider-login-hint="This is a hint" 
+                auth-client-secret="CLIENT_SECRET"
+                auth-grant-type="authorization_code" auth-protocol="id_token"
+                auth-provider-login-hint="This is a hint"
                 auth-provider-prompt="none" 
-                auth-pub-keys-src="https://login.microsoftonline.com/common/discovery/keys" 
-                auth-redirect-url="https://localhost/test/oauth2login" 
-                auth-requires-nonce="true" 
-                auth-scheme="header" 
-                auth-scope="openid email" 
+                auth-pub-keys-src="https://login.microsoftonline.com/common/discovery/keys"
+                auth-redirect-url="https://localhost/test/oauth2login"
+                auth-requires-nonce="true"
+                auth-scheme="header"
+                auth-scope="openid email"
                 auth-user-auth-url="https://login.microsoftonline.com/common/oauth2/authorize"/>
         />
         <mapping db-field-name="emailBiz" provider-claim-fieldname="upn"/>
@@ -252,30 +252,36 @@ Es wird empfohlen, die Benutzerstammdaten aus dem externen Identity Provider zu 
 
 - GENERAL
 
--- unique_identifier = string [any string but unique among the oauth2 providers] 
+`unique_identifier : string [any string but unique among the oauth2 providers]`
 
 - MAPPING
 
--- auth_DB_field_name_for_claim =  string [the name of the field respectively the column in the db used to validate the claim]
--- auth_provider_field_for_claim  =  string [the name of the field in the id token (json) used as claim]
+```text
+auth_DB_field_name_for_claim :  string [the name of the field respectively the column in the db used to validate the claim]
+auth_provider_field_for_claim  :  string [the name of the field in the id token (json) used as claim]
+```
 
 - OAUTH2/OIDC
 
--- auth_grant_type  =  'authorization_code' [the grant type, can generally be 'authorization_code', 'implicit', ...  ] here only authorization_code
--- auth_scheme  =  'header'
--- auth_protocol  =  string [code | id_token]
--- auth_requires_nonce  =  boolean [if the provider requires a nonce]
--- auth_access_token_url =  string [the providers url for the token]
--- auth_user_auth_url  =  string [the providers url for the authorization]
--- auth_pub_keys_src  =  string [the src of the public keys of the provider. a url in terms of AWS, AZURE, etc]
--- auth_oauth2_scope =  string [the scope containing at least 'openid' and the identifier of the required claim]
--- auth_oauth2_client_id =  string [the client id given by the provider]
--- auth_oauth2_client_secret =  string [the client secret given by the provider]
--- auth_oauth2_redirect_url   =  string [the url configured at the provider as redirect]
--- auth_provider_prompt   =  string [whether to show a prompt at all 'none' and 'consent' ar common among azure and google]
--- auth_provider_login_hint  =  string [hint to show with the login prompt]
+```text
+ auth_grant_type: 'authorization_code' [the grant type, can generally be 'authorization_code', 'implicit', ...  ] here only authorization_code
+ auth_scheme: 'header'
+ auth_protocol  :  string [code | id_token]
+ auth_requires_nonce  :  boolean [if the provider requires a nonce]
+ auth_access_token_url :  string [the providers url for the token]
+ auth_user_auth_url  :  string [the providers url for the authorization]
+ auth_pub_keys_src  :  string [the src of the public keys of the provider. a url in terms of AWS, AZURE, etc]
+ auth_oauth2_scope :  string [the scope containing at least 'openid' and the identifier of the required claim]
+ auth_oauth2_client_id :  string [the client id given by the provider]
+ auth_oauth2_client_secret :  string [the client secret given by the provider]
+ auth_oauth2_redirect_url   :  string [the url configured at the provider as redirect]
+ auth_provider_prompt   :  string [whether to show a prompt at all 'none' and 'consent' ar common among azure and google]
+ auth_provider_login_hint  :  string [hint to show with the login prompt]
+```
 
 - ADDITIONAL additional params as elements
 
--- response_type = id_token
--- response_mode = form_post
+```text
+ response_type : id_token
+ response_mode : form_post
+ ```
