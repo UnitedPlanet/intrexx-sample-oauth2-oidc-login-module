@@ -9,7 +9,6 @@ Mit dem Intrexx OpenID Connect Login Modul können Intrexx Benutzer über einen 
 - Okta
 - Keycloak
 - Google
-- Facebook
 - GitHub
 - oder weitere OAuth2/OIDC-konforme Identity Provider
 
