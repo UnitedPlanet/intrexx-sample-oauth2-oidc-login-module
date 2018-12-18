@@ -1,8 +1,8 @@
-# Intrexx OAuth2/OpenID Connect Login Module
+# Intrexx OAuth2/OpenID Connect Login Modul
 
-## Introduction
+## Einleitung
 
-With the Intrexx OpenID Connect Login Module, Intrexx users can be authenticated via an external identity provider and Intrexx can be integrated into single sign-on environments. Intrexx uses the standardized OAuth2 or OpenID Connect procedure for this. The following external providers come into consideration:
+Mit dem Intrexx OpenID Connect Login Modul können Intrexx Benutzer über einen externen Identitätsanbieter authentifiziert und Intrexx in Single Sign On Umgebungen integriert werden. Dabei verwendet Intrexx die standardisierten OAuth2 oder OpenID Connect Verfahren. Als externe Anbieter kommen in Betracht:
 
 - Microsoft Azure Active Directory
 - MS Active Directory Federation Services v4.0
@@ -10,21 +10,20 @@ With the Intrexx OpenID Connect Login Module, Intrexx users can be authenticated
 - Keycloak
 - Google
 - GitHub
-- or other identity providers that conform to OAuth2/OIDC
+- oder weitere OAuth2/OIDC-konforme Identity Provider
 
-## Requirements
+## Vorbedingungen
 
-- Intrexx 18.03 with OU4 or higher or Intrexx 18.09
-- The URL Rewrite Module is required for Intrexx 18.03 and Microsoft IIS to redirect the OAuth2 callbacks to the portal server
+- Intrexx 18.03 ab OU4 oder Intrexx 18.09
+- Für Intrexx 18.03 und Microsoft IIS wird das URL Rewrite Modul benötigt, um die OAuth2 Callbacks an den Portalserver weiterzuleiten
 
-## Configuration
+## Konfiguration
 
-### Define login module
+### Login Module definieren
 
-Before the module can be activated, it needs to be registered in the file "internal/cfg/LucyAuth.cfg". Insert the following block into
-the file or include the line "IntrexxOAuth2LoginModule" in your existing login configuration:
+Bevor das Modul aktiviert werden kann, muss es in der Datei internal/cfg/LucyAuth.cfg registriert werden. Fügen Sie folgenden Block der Datei hinzu oder nehmen Sie die Zeile IntrexxOAuth2LoginModule in Ihre bestehende Login Konfiguration mit auf:
 
-Example: OpenID Connect and Intrexx standard authentication:
+Beispiel OpenID Connect und Intrexx Standard Authentifizierung:
 
 ```text
 IntrexxOAuth2
@@ -41,11 +40,11 @@ IntrexxOAuth2
 };
 ```
 
-### Activate the login module using the example Microsoft Azure AD
+### Login Modul aktivieren am Beispiel Microsoft Azure AD
 
-The module is activated in the file "internal/cfg/om.cfg". Modify the entry for `binding scope="web"` to the login configuration from the LucyAuth.cfg with the OAuth2 Login Module. Insert a new `<oauth2>` section beneath `</authentication>`.
+Aktiviert wird das Modul in der Datei internal/cfg/om.cfg. Ändern Sie den Eintrag für `binding scope="web"` auf die Login Konfiguration aus der LucyAuth.cfg mit dem OAuth2 Login Modul. Fügen Sie dann einen neuen `<oauth2>` Abschnitt unter `</authentication>` hinzu.
 
-For example:
+Zum Beispiel:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -88,85 +87,83 @@ For example:
 </configuration>
 ```
 
-Here, replace `CLIENT_ID` and `CLIENT_SECRET` with the Client ID and Client Secret that you received when you registered Intrexx as an app in AzureAD. Furthermore, the redirect URL needs to be adjusted to your portal. Afterwards, the portal server needs to be restarted.
+Ersetzen Sie darin `CLIENT_ID` und `CLIENT_SECRET` mit der Client ID, die Sie bei der Registrierung von Intrexx als App bei AzureAD erhalten haben. Des Weiteren muss die Redirect URL auf das eigene Portal angepasst werden. Anschließend muss der Portalserver neu gestartet werden.
 
-### Configure redirect rules for OAuth2 callbacks
+### Umleitungsregeln für OAuth2 Callbacks einrichten
 
-When an anonymous user accesses the portal, the module automatically redirects them to the login page of the identity provider. Once they have logged in, they are then redirected to Intrexx with the ID token. So that this redirect back to Intrexx is performed correctly, you require a redirect rule for Intrexx in the front end web server.
+Wenn ein Benutzer nicht angemeldeter Benutzer auf das Portal zugreift, wird er vom Modul automatisch auf die Anmeldeseite des Identity Providers umgeleitet. Nach Anmeldung findet dann eine Umleitung zu Intrexx mit dem ID Token statt. Damit dieser Redirect korrekt an Intrexx weitgeleitet wird, benötigt man für Intexx eine Umleitungsregel im Frontend-Webserver.
 
 #### Microsoft Internet Information Server
 
-Install the IIS module "Url Rewrite" from Microsoft.
-Afterwards, create a new redirect URL as described here:
+Installieren Sie das IIS Module "Url Rewrite" von Microsoft. Anschließend erstellen Sie eine neue Umleitungsregel wie hier beschrieben:
 
-<http://up-download.de/up/docs/intrexx-onlinehelp/8100/en/index.html?p=helpfiles/help.2.connectoren-office-365.html#IIS-configuration>
+<http://up-download.de/up/docs/intrexx-onlinehelp/8100/de/index.html?p=helpfiles/help.2.connectoren-office-365.html#IIS-Konfiguration>
 
-In the "Pattern" field enter the expression `oauth2login`. Enter the expression `default.asp?urn:schemas-unitedplanet-de:ixservlet:name=oAuth2LoginIxServlet` in the "Rewrite URL" field.
+Tragen Sie dabei im Feld "Muster" den Ausdruck `oauth2login` ein und unter "URL umschreiben" den Ausdruck `default.asp?urn:schemas-unitedplanet-de:ixservlet:name=oAuth2LoginIxServlet` ein.
 
 #### Tomcat
 
-If you are using Tomcat as the web server, the redirect for OAuth2 must be entered in the "server.xml" file in the installation directory /tomcat/conf. In the Host section, search for the following entry at the end of the file: 
-
+Bei der Verwendung von Tomcat als Webserver muss der Redirect für OAuth2 in der Datei "server.xml" im Installationsverzeichnis /tomcat/conf eingetragen werden. Suchen Sie dort im Host-Abschnitt am Ende der Datei nach dem folgenden Eintrag:  
 
 ```xml
 <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" pattern="%h %l %u %t "%r" %s %b %D "%{User-Agent}i"" prefix="localhost_access_log" suffix=".txt"/>
 ```
 
-Add the following entry underneath 
+Fügen Sie direkt darunter den Eintrag  
 
 ```xml
 <Valve className="org.apache.catalina.valves.rewrite.RewriteValve" />
 ```
 
-Afterwards, create a text file called "rewrite.config" with a text editor of your choice. Enter the following there:  
+hinzu. Erstellen Sie dann mit einem beliebigen Texteditor eine Textdatei mit dem Namen "rewrite.config". Fügen Sie den folgenden Inhalt ein:  
 
 ```xml
 RewriteRule /<portalname>/oauth2login?(.*) /<portalname>/default.ixsp?urn:schemas-unitedplanet-de:ixservlet:name=oAuth2LoginIxServlet&%{QUERY_STRING} [NC,L]
 ```
 
-Please note that the portal name is case-sensitive. You can identify the portal name in the "Context" field in the portal properties. Move the rewrite.config file to the installation directory /tomcat/conf/Catalina/<host>. Afterwards, restart the Intrexx Tomcat Servlet Containers.
+Bitte beachten Sie die Groß-/Kleinschreibung beim Portalnamen. Den Portalnamen können Sie in den Portaleigenschaften im Feld "Context" ermitteln. Legen Sie die rewrite.config-Datei im Installationsverzeichnis `/tomcat/conf/Catalina/<host>` ab. Führen Sie anschließend einen Neustart des Intrexx Tomcat Servlet Containers aus.
 
-#### Intrexx 18.09 with Tomcat / IIS
+#### Intrexx 18.09 mit Tomcat / IIS
 
-A redirect rule is not required in this setting. The OAuth login end point is:
+In dieser Variante wird keine Umleitungsregel benötigt. Der OAuth2 Login Endpunkt heißt hier:
 
 `/service/oauth2/authorize`
 
-### Import SSL certificates
+### SSL Zertifikate importieren
 
-If you are using the internal Intrexx certificate store, all of the SSL certificates used by the identity provider need to be imported there (Portal properties -> Certificates -> Download from URL). Alternatively, you can use the Intrexx Java Runtime certificate store (remove the JVM parameter `-Djavax.net.ssl.trustStore=internal/cfg/cacerts` in `internal/cfg/portal.wcf`).
+Wenn der interne Zertifikatsspeicher von Intrexx benutzt wird, müssen alle vom Identity Provider verwendeten SSL Zertifikate in den Intrexx Zertifikatsspeicher importiert werden (Portaleigenschaften -> Zertifikate -> Download von URL). Alternativ kann der Zertifikatsspeicher der Intrexx Java Runtime verwendet werden (entfernen des JVM Parameters `-Djavax.net.ssl.trustStore=internal/cfg/cacerts` in der `internal/cfg/portal.wcf`).
 
-### OAuth2 login button on the portal homepage
+### OAuth2 Login Button auf Portalstartseite
 
-So that the authentication process for logging in via an external identity provider can be initiated from Intrexx, a request needs to be made to an Intrexx servlet that is informed by a query string parameter as to which provider should be used for the login (multiple providers can be defined in the om.cfg). The simplest way to do this is to add a login button to the portal login page (or another portal page). Open the file `\org\portal\internal\system\vm\html\login\logincore.vm` and insert the following line beneath the login form:
+Damit der Authentifizierungsprozess für die Benutzeranmeldung über externen Identitätsanbieter von Intrexx aus initiiert werden kann, muss zunächst ein Request auf ein Intrexx Servlet erfolgen, dem über ein Query String Parameter mitgeteilt wird, welche Provider für die Anmeldung verwendet werden soll (in der om.cfg können mehrere Provider definiert werden). Dazu lässt sich am einfachsten eine Login Schaltfläche auf der Portal Anmeldeseite (oder einer anderen Portalseite) einfügen. Öffnen Sie dazu die Datei `\org\portal\internal\system\vm\html\login\logincore.vm` und fügen Sie folgende Zeile unterhalb der Login Form ein:
 
 ```html
-<input class="Button_Standard" type="Button" onclick="location.href='?urn:schemas-unitedplanet-de:ixservlet:name=oAuth2LoginIxServlet&oauthProvider=azuread';" value="Login with Azure AD">
+<input class="Button_Standard" type="Button" onclick="location.href='?urn:schemas-unitedplanet-de:ixservlet:name=oAuth2LoginIxServlet&oauthProvider=azuread';" value="Anmeldung mit Azure AD">
 ```
 
-Here, modify the `oauthProvider` parameter and enter the name of the provider definition from `om.cfg` as the value.
+Passen Sie dabei ggf. den Parameter `oauthProvider` an und tragen als Wert den Namen der Provider Definition aus der `om.cfg` ein.
 
-You can create multiple login buttons of this type for different providers.
+Sie können mehrere solche Login Buttons für unterschiedliche Provider anlegen.
 
-### User login
+### Benutzeranmeldung
 
-Once a user clicks on one of the OAuth2 login buttons on the homepage, they will automatically be redirected to the provider and then back to Intrexx. Intrexx then receives the user information from the ID token and maps the token value to a field in the Intrexx user data to identify and log in a single Intrexx user. The mapping between the provider field and the Intrexx user field can be adjusted in om.cfg. Typically, the user's email address is used. It is important that the values in the selected user data field are unique. If multiple users are identified based on the token, the login is cancelled with an error.
+Klickt ein Benutzer auf der Startseite auf einen der OAuth2 Anmelde-Buttons, wird er automatisch an den Provider umgeleitet und von diesem wieder an Intrexx. Intrexx erhält dann die Benutzerinformationen aus dem ID Token und mappt den Wert aus dem Token auf ein Feld in den Intrexx Benutzerstammdaten, um einen einzelnen Intrexx User zu identifizieren und anzumelden. Das Mapping zwischen Provider Feld und Intrexx Benutzerfeld kann in der om.cfg angepasst werden. Üblicherweise wird die E-Mailadresse des Benutzers dafür verwendet. Wichtig ist, dass die Werte in dem gewählten Benutzerstammdatenfeld eindeutig sind. Werden mehrere Benutzer anhand eines Token Werts ermittelt, wird die Anmeldung mit einem Fehler abgebrochen.
 
-### User replication
+### Benutzerreplikation
 
-It is recommended to import/replicate the user data from an external identity provider. If you are using Azure AD or ADFS, this can be achieved via LDAP.
+Es wird empfohlen, die Benutzerstammdaten aus dem externen Identity Provider zu importieren/replizieren. Im Fall von Azure AD oder ADFS ist dies via LDAP möglich.
 
-### Links with more information
+### Weiterführende Links
 
-<https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc>
+<https://docs.microsoft.com/de-de/azure/active-directory/develop/v2-protocols-oidc>
 
 <https://developers.google.com/identity/protocols/OpenIDConnect>
 
-<https://docs.microsoft.com/en-us/azure/active-directory/develop/v1-protocols-openid-connect-code>
+<https://docs.microsoft.com/de-de/azure/active-directory/develop/v1-protocols-openid-connect-code>
 
 <https://developer.okta.com/docs/api/resources/oidc>
 
-### More configuration examples
+### Weitere Konfigurationsbeispiele
 
 ```xml
 <oauth2 name="azurev1">
@@ -238,7 +235,7 @@ It is recommended to import/replicate the user data from an external identity pr
                 auth-requires-nonce="true"
                 auth-access-token-url="https://dev-xxxxx.oktapreview.com/oauth2/default/v1/token"
                 auth-user-auth-url="https://dev-xxxxx.oktapreview.com/oauth2/default/v1/authorize"
-                auth-pub-keys-src="https://dev-748399.oktapreview.com/oauth2/default/v1/keys"
+                auth-pub-keys-src="https://dev-xxxxx.oktapreview.com/oauth2/default/v1/keys"
                 auth-scope="openid email"
                 auth-client-id="CLIENT_ID"
                 auth-client-secret="CLIENT_SECRET"
@@ -250,7 +247,7 @@ It is recommended to import/replicate the user data from an external identity pr
 </oauth2>
 ```
 
-### Configuration reference
+### Konfigurationsreferenz
 
 - GENERAL
 
