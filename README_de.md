@@ -123,11 +123,11 @@ RewriteRule /<portalname>/oauth2login?(.*) /<portalname>/default.ixsp?urn:schema
 
 Bitte beachten Sie die Groß-/Kleinschreibung beim Portalnamen. Den Portalnamen können Sie in den Portaleigenschaften im Feld "Context" ermitteln. Legen Sie die rewrite.config-Datei im Installationsverzeichnis `/tomcat/conf/Catalina/<host>` ab. Führen Sie anschließend einen Neustart des Intrexx Tomcat Servlet Containers aus.
 
-#### Intrexx 18.09 mit Tomcat / IIS
+#### Intrexx ab 18.09 mit Tomcat / IIS
 
 In dieser Variante wird keine Umleitungsregel benötigt. Der OAuth2 Login Endpunkt heißt hier:
 
-`/service/oauth2/authorize`
+`/login/oic/authenticate`
 
 ### SSL Zertifikate importieren
 
