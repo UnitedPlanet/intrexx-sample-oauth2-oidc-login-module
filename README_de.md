@@ -67,6 +67,7 @@ Zum Beispiel:
                 auth-requires-nonce="true"
                 auth-access-token-url="https://login.microsoftonline.com/common/oauth2/v2.0/token"
                 auth-user-auth-url="https://login.microsoftonline.com/common/oauth2/v2.0/authorize"
+                auth-user-info-url=""
                 auth-pub-keys-src="https://login.microsoftonline.com/common/discovery/v2.0/keys"
                 auth-scope="openid email"
                 auth-client-id="CLIENT_ID"
@@ -179,7 +180,8 @@ Es wird empfohlen, die Benutzerstammdaten aus dem externen Identity Provider zu 
                 auth-requires-nonce="true"
                 auth-scheme="header"
                 auth-scope="openid email"
-                auth-user-auth-url="https://login.microsoftonline.com/common/oauth2/authorize"/>
+                auth-user-auth-url="https://login.microsoftonline.com/common/oauth2/authorize"
+                auth-user-info-url=""/>
         />
         <mapping db-field-name="emailBiz" provider-claim-fieldname="upn"/>
         <additional-redirect-params>
@@ -196,6 +198,7 @@ Es wird empfohlen, die Benutzerstammdaten aus dem externen Identity Provider zu 
                 auth-access-token-url="https://login.microsoftonline.com/common/oauth2/v2.0/token"
                 auth-user-auth-url="https://login.microsoftonline.com/common/oauth2/v2.0/authorize"
                 auth-pub-keys-src="https://login.microsoftonline.com/common/discovery/v2.0/keys"
+                auth-user-info-url=""
                 auth-scope="openid email"
                 auth-client-id="CLIENT_ID"
                 auth-client-secret="CLIENT_SECRET"
@@ -218,6 +221,7 @@ Es wird empfohlen, die Benutzerstammdaten aus dem externen Identity Provider zu 
                 auth-access-token-url="https://www.googleapis.com/oauth2/v4/token"
                 auth-user-auth-url="https://accounts.google.com/o/oauth2/v2/auth"
                 auth-pub-keys-src="https://www.googleapis.com/oauth2/v3/certs"
+                auth-user-info-url=""
                 auth-scope="openid email"
                 auth-client-id="CLIENT_ID"
                 auth-client-secret="CLIENT_SECRET"
@@ -236,6 +240,7 @@ Es wird empfohlen, die Benutzerstammdaten aus dem externen Identity Provider zu 
                 auth-access-token-url="https://dev-xxxxx.oktapreview.com/oauth2/default/v1/token"
                 auth-user-auth-url="https://dev-xxxxx.oktapreview.com/oauth2/default/v1/authorize"
                 auth-pub-keys-src="https://dev-xxxxx.oktapreview.com/oauth2/default/v1/keys"
+                auth-user-info-url=""
                 auth-scope="openid email"
                 auth-client-id="CLIENT_ID"
                 auth-client-secret="CLIENT_SECRET"
