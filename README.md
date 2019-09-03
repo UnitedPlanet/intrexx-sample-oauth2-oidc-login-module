@@ -277,6 +277,7 @@ auth_provider_field_for_claim  :  string [the name of the field in the id token 
  auth_requires_nonce  :  boolean [if the provider requires a nonce]
  auth_access_token_url :  string [the providers url for the token]
  auth_user_auth_url  :  string [the providers url for the authorization]
+ auth_user_info_url  :  string [the providers url for the user info endpoint]
  auth_pub_keys_src  :  string [the src of the public keys of the provider. a url in terms of AWS, AZURE, etc]
  auth_oauth2_scope :  string [the scope containing at least 'openid' and the identifier of the required claim]
  auth_oauth2_client_id :  string [the client id given by the provider]
