@@ -94,7 +94,13 @@ Ersetzen Sie darin `CLIENT_ID` und `CLIENT_SECRET` mit der Client ID, die Sie be
 
 Wenn ein Benutzer nicht angemeldeter Benutzer auf das Portal zugreift, wird er vom Modul automatisch auf die Anmeldeseite des Identity Providers umgeleitet. Nach Anmeldung findet dann eine Umleitung zu Intrexx mit dem ID Token statt. Damit dieser Redirect korrekt an Intrexx weitgeleitet wird, benötigt man für Intexx eine Umleitungsregel im Frontend-Webserver.
 
-#### Microsoft Internet Information Server
+#### Intrexx ab 18.09 mit Tomcat / IIS
+
+In dieser Variante wird keine Umleitungsregel benötigt. Der OAuth2 Callback Endpunkt heißt hier:
+
+`https://your-portal/login/oic/authenticate`
+
+#### Intrexx 18.03 mit Microsoft Internet Information Server
 
 Installieren Sie das IIS Module "Url Rewrite" von Microsoft. Anschließend erstellen Sie eine neue Umleitungsregel wie hier beschrieben:
 
@@ -102,7 +108,7 @@ Installieren Sie das IIS Module "Url Rewrite" von Microsoft. Anschließend erste
 
 Tragen Sie dabei im Feld "Muster" den Ausdruck `oauth2login` ein und unter "URL umschreiben" den Ausdruck `default.asp?urn:schemas-unitedplanet-de:ixservlet:name=oAuth2LoginIxServlet` ein.
 
-#### Tomcat
+#### Intrexx 18.03 mit Tomcat
 
 Bei der Verwendung von Tomcat als Webserver muss der Redirect für OAuth2 in der Datei "server.xml" im Installationsverzeichnis /tomcat/conf eingetragen werden. Suchen Sie dort im Host-Abschnitt am Ende der Datei nach dem folgenden Eintrag:  
 
@@ -123,12 +129,6 @@ RewriteRule /<portalname>/oauth2login?(.*) /<portalname>/default.ixsp?urn:schema
 ```
 
 Bitte beachten Sie die Groß-/Kleinschreibung beim Portalnamen. Den Portalnamen können Sie in den Portaleigenschaften im Feld "Context" ermitteln. Legen Sie die rewrite.config-Datei im Installationsverzeichnis `/tomcat/conf/Catalina/<host>` ab. Führen Sie anschließend einen Neustart des Intrexx Tomcat Servlet Containers aus.
-
-#### Intrexx ab 18.09 mit Tomcat / IIS
-
-In dieser Variante wird keine Umleitungsregel benötigt. Der OAuth2 Login Endpunkt heißt hier:
-
-`/login/oic/authenticate`
 
 ### SSL Zertifikate importieren
 

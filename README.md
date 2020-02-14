@@ -95,7 +95,13 @@ Here, replace `CLIENT_ID` and `CLIENT_SECRET` with the Client ID and Client Secr
 
 When an anonymous user accesses the portal, the module automatically redirects them to the login page of the identity provider. Once they have logged in, they are then redirected to Intrexx with the ID token. So that this redirect back to Intrexx is performed correctly, you require a redirect rule for Intrexx in the front end web server.
 
-#### Microsoft Internet Information Server
+#### Intrexx 18.09 or later with Tomcat / IIS
+
+A redirect rule is not required in this setting. The OAuth2 callback endpoint is:
+
+`https://your-portal/login/oic/authenticate`
+
+#### Intrexx 18.03 with IIS
 
 Install the IIS module "Url Rewrite" from Microsoft.
 Afterwards, create a new redirect URL as described here:
@@ -104,10 +110,9 @@ Afterwards, create a new redirect URL as described here:
 
 In the "Pattern" field enter the expression `oauth2login`. Enter the expression `default.asp?urn:schemas-unitedplanet-de:ixservlet:name=oAuth2LoginIxServlet` in the "Rewrite URL" field.
 
-#### Tomcat
+#### Intrexx 18.03 with Tomcat
 
 If you are using Tomcat as the web server, the redirect for OAuth2 must be entered in the "server.xml" file in the installation directory /tomcat/conf. In the Host section, search for the following entry at the end of the file: 
-
 
 ```xml
 <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" pattern="%h %l %u %t "%r" %s %b %D "%{User-Agent}i"" prefix="localhost_access_log" suffix=".txt"/>
@@ -126,12 +131,6 @@ RewriteRule /<portalname>/oauth2login?(.*) /<portalname>/default.ixsp?urn:schema
 ```
 
 Please note that the portal name is case-sensitive. You can identify the portal name in the "Context" field in the portal properties. Move the rewrite.config file to the installation directory /tomcat/conf/Catalina/<host>. Afterwards, restart the Intrexx Tomcat Servlet Containers.
-
-#### Intrexx 18.09 or later with Tomcat / IIS
-
-A redirect rule is not required in this setting. The OAuth login end point is:
-
-`/login/oic/authenticate`
 
 ### Import SSL certificates
 
