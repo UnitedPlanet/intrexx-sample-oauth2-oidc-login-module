@@ -136,7 +136,7 @@ Wenn der interne Zertifikatsspeicher von Intrexx benutzt wird, müssen alle vom 
 
 ### OAuth2 Login Button auf Portalstartseite
 
-Damit der Authentifizierungsprozess für die Benutzeranmeldung über externen Identitätsanbieter von Intrexx aus initiiert werden kann, muss zunächst ein Request auf ein Intrexx Servlet erfolgen, dem über ein Query String Parameter mitgeteilt wird, welche Provider für die Anmeldung verwendet werden soll (in der om.cfg können mehrere Provider definiert werden). Dazu lässt sich am einfachsten eine Login Schaltfläche auf der Portal Anmeldeseite (oder einer anderen Portalseite) einfügen. Öffnen Sie dazu die Datei `\org\portal\internal\system\vm\html\login\logincore.vm` und fügen Sie folgende Zeile unterhalb der Login Form ein:
+Damit der Authentifizierungsprozess für die Benutzeranmeldung über externen Identitätsanbieter von Intrexx aus initiiert werden kann, muss zunächst ein Request auf ein Intrexx Servlet erfolgen, dem über ein Query String Parameter mitgeteilt wird, welche Provider für die Anmeldung verwendet werden soll (in der om.cfg können mehrere Provider definiert werden). Zu Testzwecken lässt sich dazu am einfachsten eine Login Schaltfläche auf der Portal Anmeldeseite (oder einer anderen Portalseite) einfügen. Öffnen Sie dazu die Datei `\org\portal\internal\system\vm\html\login\logincore.vm` und fügen Sie folgende Zeile unterhalb der Login Form ein:
 
 ```html
 <input class="Button_Standard" type="Button" onclick="location.href='?urn:schemas-unitedplanet-de:ixservlet:name=oAuth2LoginIxServlet&oauthProvider=azuread';" value="Anmeldung mit Azure AD">
@@ -145,6 +145,8 @@ Damit der Authentifizierungsprozess für die Benutzeranmeldung über externen Id
 Passen Sie dabei ggf. den Parameter `oauthProvider` an und tragen als Wert den Namen der Provider Definition aus der `om.cfg` ein.
 
 Sie können mehrere solche Login Buttons für unterschiedliche Provider anlegen.
+
+Für produktive Systeme wird dringend empfohlen, ein Portlet mit einem Login Button zu erstellen und dieses auf die Portalstartseite zu platzieren. Ansonsten werden die Änderungen an der logincore.vm durch Intrexx Updates unter Umständen wieder überschrieben. In diesem Repository befindet sich eine Intrexx App mit Login Portlet als Beispiel.
 
 ### Benutzeranmeldung
 
