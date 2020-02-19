@@ -265,8 +265,14 @@ It is recommended to import/replicate the user data from an external identity pr
 - MAPPING
 
 ```text
-auth_DB_field_name_for_claim :  string [the name of the field respectively the column in the db used to validate the claim]
-auth_provider_field_for_claim  :  string [the name of the field in the id token (json) used as claim]
+db-field-name:  string [the property name or GUID of the Intrexx user schema field used to validate the claim]
+provider-claim-fieldname  :  string [the name of the field in the id token (json) used as claim]
+
+Examples:
+
+<mapping db-field-name="GUID-of-db-field" provider-claim-fieldname="email"/>
+<mapping db-field-name="loginLwr" provider-claim-fieldname="preferred_username"/>
+<mapping db-field-name="emailBiz" provider-claim-fieldname="email"/>
 ```
 
 - OAUTH2/OIDC
@@ -274,23 +280,23 @@ auth_provider_field_for_claim  :  string [the name of the field in the id token 
 ```text
  auth_grant_type: 'authorization_code' [the grant type, can generally be 'authorization_code', 'implicit', ...  ] here only authorization_code
  auth_scheme: 'header'
- auth_protocol  :  string [code | id_token]
- auth_requires_nonce  :  boolean [if the provider requires a nonce]
- auth_access_token_url :  string [the providers url for the token]
- auth_user_auth_url  :  string [the providers url for the authorization]
- auth_user_info_url  :  string [the providers url for the user info endpoint]
- auth_pub_keys_src  :  string [the src of the public keys of the provider. a url in terms of AWS, AZURE, etc]
- auth_oauth2_scope :  string [the scope containing at least 'openid' and the identifier of the required claim]
- auth_oauth2_client_id :  string [the client id given by the provider]
- auth_oauth2_client_secret :  string [the client secret given by the provider]
- auth_oauth2_redirect_url   :  string [the url configured at the provider as redirect]
- auth_provider_prompt   :  string [whether to show a prompt at all 'none' and 'consent' ar common among azure and google]
- auth_provider_login_hint  :  string [hint to show with the login prompt]
+ auth_protocol:  string [code | id_token]
+ auth_requires_nonce:  boolean [if the provider requires a nonce]
+ auth_access_token_url:  string [the providers url for the token]
+ auth_user_auth_url:  string [the providers url for the authorization]
+ auth_user_info_url:  string [the providers url for the user info endpoint]
+ auth_pub_keys_src:  string [the src of the public keys of the provider. a url in terms of AWS, AZURE, etc]
+ auth_oauth2_scope:  string [the scope containing at least 'openid' and the identifier of the required claim]
+ auth_oauth2_client_id:  string [the client id given by the provider]
+ auth_oauth2_client_secret:  string [the client secret given by the provider]
+ auth_oauth2_redirect_url:  string [the url configured at the provider as redirect]
+ auth_provider_prompt:  string [whether to show a prompt at all 'none' and 'consent' ar common among azure and google]
+ auth_provider_login_hint:  string [hint to show with the login prompt]
 ```
 
 - ADDITIONAL additional params as elements
 
 ```text
- response_type : id_token
- response_mode : form_post
+ response_type: id_token
+ response_mode: form_post
  ```
