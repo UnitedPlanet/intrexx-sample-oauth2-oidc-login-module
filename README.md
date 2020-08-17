@@ -270,9 +270,9 @@ provider-claim-fieldname  :  string [the name of the field in the id token (json
 
 Examples:
 
-<mapping db-field-name="GUID-of-db-field" provider-claim-fieldname="email"/>
-<mapping db-field-name="loginLwr" provider-claim-fieldname="preferred_username"/>
-<mapping db-field-name="emailBiz" provider-claim-fieldname="email"/>
+<mapping db-field-name="GUID-of-db-field" provider-claim-fieldname="email" enable-user-registration="false"/>
+<mapping db-field-name="loginLwr" provider-claim-fieldname="preferred_username" enable-user-registration="false"/>
+<mapping db-field-name="emailBiz" provider-claim-fieldname="email" enable-user-registration="false"/>
 ```
 
 - OAUTH2/OIDC
@@ -300,3 +300,173 @@ Examples:
  response_type: id_token
  response_mode: form_post
  ```
+
+### User Registration
+
+When the mapping attribbute `enable-user-registration` is set to true, user accounts will be created automatically when user authentication was successful but a corresponding Intrexx user account does not exist. In this case, a custom Groovy script will be executed which leverages the Groovy user management API to create a new user. If a user could be created successfully, they will be logged in automatically. If an user account already exists but is disabled, the user will not be logged in before an Intrexx administrator enables the account again. If an account was deleted before, it will be re-created. The user details can be accessed via the script variable accessTokenDetails (of type HashMap). The map contains also the actual OAuth2 access token which can be used to send further HTTP requests to the external API.
+
+Edit `internal/cfg/om.cfg`:
+
+```xml
+ <mapping db-field-name="emailBiz" provider-claim-fieldname="email" enable-user-registration="true"/>
+```
+
+Edit `internal/cfg/spring/00-default-context.xml`:
+
+```xml
+    <!-- The OAuth2 login bean-->
+    <bean id="defaultOAuth2Login" class="de.uplanet.lucy.server.login.OAuth2LoginBean">
+        <!-- set to false only when in development mode, otherwise changes to the script requires portal server restart -->
+		<property name="cacheCompiledScript" value="true" />
+        <!-- internal path to the Groovy user registration script -->
+        <property name="userMappingScript" value="internal/cfg/oauth2_user_registration.groovy" />
+	</bean>
+```
+
+Add a new file `internal/cfg/oauth2_user_registration.groovy`:
+
+```groovy
+// creates new user after successful authentication
+
+g_syslog.info(accessTokenDetails)
+
+// Intrexx internal class ID for tenant containers
+TENANT_CLASS_ID = 12
+
+try
+{
+	//check if tenant (CompanyID) exists
+	def tenant = g_om.getOrgStructure().findContainerNode(accessTokenDetails["CompanyID"])
+
+	if (tenant) {
+		assert tenant.classId == TENANT_CLASS_ID
+	}
+	else
+	{
+		// create the tenant
+		tenant = g_om.createContainer("TENANT", {
+			container = "Tenants"  // the parent container for new tenants
+			name = accessTokenDetails["CompanyID"]
+			description = accessTokenDetails["Company"]
+			//set("CompanyID", accessTokenDetails["CompanyID"]) add custom schema attributes
+		})
+	}
+
+	// prepare the user groups from roles
+	def roles = accessTokenDetails["Roles"]
+	def ixRoles = [:]
+
+	if (roles) {
+		roles.forEach { roleValues ->
+			ixGroup = ""
+
+			// map the roles to Intrexx user groups (by name or GUID)
+			switch(roleValues["RoleType"]) {
+				case "SYSADMIN": ixGroup = "Administratoren"; break;
+				case "ADMIN": ixGroup = "Administratoren"; break;
+				case "FACILITATOR": ixGroup = "Facilitator"; break;
+				case "NAMSPLUS": ixGroup = "NAMS.Plus"; break;
+				case "NAMSLITE": ixGroup = "NAMS.Lite"; break;
+				case "CONSULTANT": ixGroup = "Consultant"; break;
+				case "MATURITY": ixGroup = "NAMS.Mat"; break;
+				case "RISK": ixGroup = "NAMS.Risk"; break;
+				default: ixGroup = "Benutzer"
+			}
+
+			ixRoles[ixGroup] = 1
+		}
+	}
+
+	// generate a random password
+	def pwGuid = newGuid()
+	def pw = g_om.getEncryptedPassword(["password": pwGuid])
+
+	// create the new user
+	def user = g_om.createUser {
+		container     = "System" // name of the parent container for new users
+		name          =  accessTokenDetails["WebLogin"]
+		password      =  pw
+		loginName     =  accessTokenDetails["WebLogin"]
+		emailBiz      =  accessTokenDetails["EMail"]
+		description   = "OIDC user created at ${now().withoutFractionalSeconds}"
+		TENANT        =  tenant.guid
+
+		// a list of GUIDs or names of user groups
+		//memberOf = ["6AA80844C3C99EF93BF4536EB18605BF86FDD3C5"]
+		memberOf = ixRoles.keySet()
+	}
+
+	g_syslog.info("Created user from OIDC: ${user.loginName}/${tenant.name}")
+	g_syslog.info("User groups" + ixRoles.keySet())
+	return true
+}
+catch (Exception e)
+{
+	g_syslog.error("Failed to create user: " + e.message, e)
+	return false
+}
+```
+
+## Existing User Update
+
+When the `enable-user-registration` attribute in om.cfg ist set to `true`, a further custom Groovy script can be defined to update an existing user after successful login. The user details can be accessed via the script variable `accessTokenDetails` (of type `HashMap`) along with the current Intrexx user object `ixUserRecord`. The map contains also the actual OAuth2 access token which can be used to send further HTTP requests to an external API.
+
+Edit `internal/cfg/spring/00-default-context.xml`:
+
+```xml
+    <!-- The OAuth2 login bean-->
+    <bean id="defaultOAuth2Login" class="de.uplanet.lucy.server.login.OAuth2LoginBean">
+        <!-- set to false only when in development mode, otherwise changes to the script requires portal server restart -->
+		<property name="cacheCompiledScript" value="true" />
+        <!-- internal path to the Groovy user registration script -->
+        <property name="userMappingScript" value="internal/cfg/oauth2_user_registration.groovy" />
+		<property name="userUpdateScript" value="internal/cfg/oauth2_user_update.groovy" />
+	</bean>
+```
+
+Add a new file `internal/cfg/oauth2_user_update.groovy`:
+
+```groovy
+// log user details
+g_log.info(accessTokenDetails)
+g_log.info(accessTokenDetails["ixUserRecord"])
+
+// update user/roles etc. as in registration script
+
+return true
+```
+
+## Troubleshooting
+
+### Log output
+
+To trace the authentication flow, you can enable detailed output in the Intrexx portal.log file. Open the file `internal/cfg/log4j2.xml` and add another section. Restart the portal server afterwards.
+
+```xml
+<!-- logging for OIDC auth -->
+<Logger name="de.uplanet.lucy.server.composer.ixservlet.OAuth2LoginIxServlet" level="debug" additivity="false">
+    <AppenderRef ref="DailyFile"/>
+</Logger>
+<Logger name="de.uplanet.lucy.server.login" level="debug" additivity="false">
+    <AppenderRef ref="DailyFile"/>
+</Logger>
+```
+
+Furthermore, you can add this section to trace the HTTP requests/responses between Intrexx and the IdP.
+
+```xml
+	<Logger name="org.apache.http" level="INFO"  additivity="false">
+		<AppenderRef ref="Console"/>
+		<!-- <AppenderRef ref="DailyFile"/>-->
+	</Logger>
+	<Logger name="org.apache.http.impl.conn" level="INFO"  additivity="false">
+		<AppenderRef ref="Console"/>
+		<!-- <AppenderRef ref="DailyFile"/>-->
+	</Logger>
+	<Logger name="org.apache.http.wire" level="INFO"  additivity="false">
+		<AppenderRef ref="Console"/>
+		<!-- <AppenderRef ref="DailyFile"/>-->
+	</Logger>
+```
+
+Do not forget to remove these sections after analysing issues as they degrade runtime performance and pollute the server log file.
