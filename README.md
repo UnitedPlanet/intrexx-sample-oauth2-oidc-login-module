@@ -364,12 +364,7 @@ try
 			switch(roleValues["RoleType"]) {
 				case "SYSADMIN": ixGroup = "Administratoren"; break;
 				case "ADMIN": ixGroup = "Administratoren"; break;
-				case "FACILITATOR": ixGroup = "Facilitator"; break;
-				case "NAMSPLUS": ixGroup = "NAMS.Plus"; break;
-				case "NAMSLITE": ixGroup = "NAMS.Lite"; break;
-				case "CONSULTANT": ixGroup = "Consultant"; break;
-				case "MATURITY": ixGroup = "NAMS.Mat"; break;
-				case "RISK": ixGroup = "NAMS.Risk"; break;
+				case "USERS": ixGroup = "Benutzer"; break;
 				default: ixGroup = "Benutzer"
 			}
 
@@ -384,10 +379,10 @@ try
 	// create the new user
 	def user = g_om.createUser {
 		container     = "System" // name of the parent container for new users
-		name          =  accessTokenDetails["WebLogin"]
+		name          =  accessTokenDetails["user"]
 		password      =  pw
-		loginName     =  accessTokenDetails["WebLogin"]
-		emailBiz      =  accessTokenDetails["EMail"]
+		loginName     =  accessTokenDetails["user"]
+		emailBiz      =  accessTokenDetails["email"]
 		description   = "OIDC user created at ${now().withoutFractionalSeconds}"
 		TENANT        =  tenant.guid
 
