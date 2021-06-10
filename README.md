@@ -269,16 +269,17 @@ Edit `internal/cfg/om.cfg`:
  <mapping db-field-name="emailBiz" provider-claim-fieldname="email" enable-user-registration="true"/>
 ```
 
-Edit `internal/cfg/spring/00-default-context.xml`:
+Edit `internal/cfg/spring/00-oauth2-context.xml`:
 
 ```xml
     <!-- The OAuth2 login bean-->
     <bean id="defaultOAuth2Login" class="de.uplanet.lucy.server.login.OAuth2LoginBean">
         <!-- set to false only when in development mode, otherwise changes to the script requires portal server restart -->
-		<property name="cacheCompiledScript" value="true" />
+            <property name="cacheCompiledScript" value="true" />
         <!-- internal path to the Groovy user registration script -->
         <property name="userMappingScript" value="internal/cfg/oauth2_user_registration.groovy" />
-	</bean>
+        <property name="userUpdateScript" value="internal/cfg/oauth2_user_update.groovy"/>
+    </bean>
 ```
 
 Add a new file `internal/cfg/oauth2_user_registration.groovy`:
@@ -364,17 +365,17 @@ catch (Exception e)
 
 When the `enable-user-registration` attribute in om.cfg ist set to `true`, a further custom Groovy script can be defined to update an existing user after successful login. The user details can be accessed via the script variable `accessTokenDetails` (of type `HashMap`) along with the current Intrexx user object `ixUserRecord`. The map contains also the actual OAuth2 access token which can be used to send further HTTP requests to an external API.
 
-Edit `internal/cfg/spring/00-default-context.xml`:
+Edit `internal/cfg/spring/00-oauth2-context.xml`:
 
 ```xml
     <!-- The OAuth2 login bean-->
     <bean id="defaultOAuth2Login" class="de.uplanet.lucy.server.login.OAuth2LoginBean">
         <!-- set to false only when in development mode, otherwise changes to the script requires portal server restart -->
-		<property name="cacheCompiledScript" value="true" />
+            <property name="cacheCompiledScript" value="true" />
         <!-- internal path to the Groovy user registration script -->
         <property name="userMappingScript" value="internal/cfg/oauth2_user_registration.groovy" />
-		<property name="userUpdateScript" value="internal/cfg/oauth2_user_update.groovy" />
-	</bean>
+        <property name="userUpdateScript" value="internal/cfg/oauth2_user_update.groovy"/>
+    </bean>
 ```
 
 Add a new file `internal/cfg/oauth2_user_update.groovy`:
