@@ -10,12 +10,11 @@ With the Intrexx OpenID Connect Login Module, Intrexx users can be authenticated
 - Keycloak
 - Google
 - GitHub
-- or other identity providers that conform to OAuth2/OIDC
+- or other identity providers that conform to OAuth2/OpenID Connect
 
 ## Requirements
 
-- Intrexx 18.03 with OU4 or higher.
-- The URL Rewrite Module is required for Intrexx 18.03 and Microsoft IIS to redirect the OAuth2 callbacks to the portal server. Starting with 19.03 this is not required anymore.
+- Intrexx 19.03 or higher. For 18.03 checkout the `v18.03` branch.
 
 ## Configuration
 
@@ -73,7 +72,7 @@ For example:
                 auth-scope="openid email"
                 auth-client-id="CLIENT_ID"
                 auth-client-secret="CLIENT_SECRET"
-                auth-redirect-url="https://intrexx/portal/oauth2login"
+                auth-redirect-url="https://intrexxserver/login/oic/authenticate"
                 auth-provider-prompt="none"
                 auth-provider-login-hint="This is a hint"
         />
@@ -90,47 +89,6 @@ For example:
 ```
 
 Here, replace `CLIENT_ID` and `CLIENT_SECRET` with the Client ID and Client Secret that you received when you registered Intrexx as an app in AzureAD. Furthermore, the redirect URL needs to be adjusted to your portal. Afterwards, the portal server needs to be restarted.
-
-### Configure redirect rules for OAuth2 callbacks
-
-When an anonymous user accesses the portal, the module automatically redirects them to the login page of the identity provider. Once they have logged in, they are then redirected to Intrexx with the ID token. So that this redirect back to Intrexx is performed correctly, you require a redirect rule for Intrexx in the front end web server.
-
-#### Intrexx 19.03 or later with Tomcat / IIS
-
-A redirect rule is not required in this setting. The OAuth2 callback endpoint is:
-
-`https://your-portal/login/oic/authenticate`
-
-#### Intrexx 18.03 with IIS
-
-Install the IIS module "Url Rewrite" from Microsoft.
-Afterwards, create a new redirect URL as described here:
-
-<http://up-download.de/up/docs/intrexx-onlinehelp/8100/en/index.html?p=helpfiles/help.2.connectoren-office-365.html#IIS-configuration>
-
-In the "Pattern" field enter the expression `oauth2login`. Enter the expression `default.asp?urn:schemas-unitedplanet-de:ixservlet:name=oAuth2LoginIxServlet` in the "Rewrite URL" field.
-
-#### Intrexx 18.03 with Tomcat
-
-If you are using Tomcat as the web server, the redirect for OAuth2 must be entered in the "server.xml" file in the installation directory /tomcat/conf. In the Host section, search for the following entry at the end of the file: 
-
-```xml
-<Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" pattern="%h %l %u %t "%r" %s %b %D "%{User-Agent}i"" prefix="localhost_access_log" suffix=".txt"/>
-```
-
-Add the following entry underneath 
-
-```xml
-<Valve className="org.apache.catalina.valves.rewrite.RewriteValve" />
-```
-
-Afterwards, create a text file called "rewrite.config" with a text editor of your choice. Enter the following there:  
-
-```xml
-RewriteRule /<portalname>/oauth2login?(.*) /<portalname>/default.ixsp?urn:schemas-unitedplanet-de:ixservlet:name=oAuth2LoginIxServlet&%{QUERY_STRING} [NC,L]
-```
-
-Please note that the portal name is case-sensitive. You can identify the portal name in the "Context" field in the portal properties. Move the rewrite.config file to the installation directory /tomcat/conf/Catalina/<host>. Afterwards, restart the Intrexx Tomcat Servlet Containers.
 
 ### Import SSL certificates
 
@@ -206,7 +164,7 @@ It is recommended to import/replicate the user data from an external identity pr
                 auth-scope="openid email"
                 auth-client-id="CLIENT_ID"
                 auth-client-secret="CLIENT_SECRET"
-                auth-redirect-url="https://localhost/test/oauth2login"
+                auth-redirect-url="https://intrexxserver/login/oic/authenticate"
                 auth-provider-prompt="none"
                 auth-provider-login-hint="This is a hint"
         />
@@ -229,7 +187,7 @@ It is recommended to import/replicate the user data from an external identity pr
                 auth-scope="openid email"
                 auth-client-id="CLIENT_ID"
                 auth-client-secret="CLIENT_SECRET"
-                auth-redirect-url="https://localhost/test/oauth2login"
+                auth-redirect-url="https://intrexxserver/login/oic/authenticate"
                 auth-provider-prompt="none"
                 auth-provider-login-hint="This is a hint"
         />
@@ -248,7 +206,7 @@ It is recommended to import/replicate the user data from an external identity pr
                 auth-scope="openid email"
                 auth-client-id="CLIENT_ID"
                 auth-client-secret="CLIENT_SECRET"
-                auth-redirect-url="https://localhost/default.ixsp?urn:schemas-unitedplanet-de:ixservlet:name=oAuth2LoginIxServlet"
+                auth-redirect-url="https://intrexxserver/login/oic/authenticate"
                 auth-provider-prompt="none"
                 auth-provider-login-hint="This is a hint"
         />
