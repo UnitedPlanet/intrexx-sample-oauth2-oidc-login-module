@@ -14,8 +14,8 @@ With the Intrexx OpenID Connect Login Module, Intrexx users can be authenticated
 
 ## Requirements
 
-- Intrexx 18.03 with OU4 or higher or Intrexx 18.09
-- The URL Rewrite Module is required for Intrexx 18.03 and Microsoft IIS to redirect the OAuth2 callbacks to the portal server
+- Intrexx 18.03 with OU4 or higher.
+- The URL Rewrite Module is required for Intrexx 18.03 and Microsoft IIS to redirect the OAuth2 callbacks to the portal server. Starting with 19.03 this is not required anymore.
 
 ## Configuration
 
@@ -95,7 +95,7 @@ Here, replace `CLIENT_ID` and `CLIENT_SECRET` with the Client ID and Client Secr
 
 When an anonymous user accesses the portal, the module automatically redirects them to the login page of the identity provider. Once they have logged in, they are then redirected to Intrexx with the ID token. So that this redirect back to Intrexx is performed correctly, you require a redirect rule for Intrexx in the front end web server.
 
-#### Intrexx 18.09 or later with Tomcat / IIS
+#### Intrexx 19.03 or later with Tomcat / IIS
 
 A redirect rule is not required in this setting. The OAuth2 callback endpoint is:
 

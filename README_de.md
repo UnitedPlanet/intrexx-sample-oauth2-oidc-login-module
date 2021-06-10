@@ -14,8 +14,8 @@ Mit dem Intrexx OpenID Connect Login Modul können Intrexx Benutzer über einen 
 
 ## Vorbedingungen
 
-- Intrexx 18.03 ab OU4 oder Intrexx 18.09
-- Für Intrexx 18.03 und Microsoft IIS wird das URL Rewrite Modul benötigt, um die OAuth2 Callbacks an den Portalserver weiterzuleiten
+- Intrexx 18.03 ab OU4
+- Für Intrexx 18.03 und Microsoft IIS wird das URL Rewrite Modul benötigt, um die OAuth2 Callbacks an den Portalserver weiterzuleiten. Ab Intrexx 19.03 ist dies nicht mehr erforderlich.
 
 ## Konfiguration
 
