@@ -138,7 +138,7 @@ It is recommended to import/replicate the user data from an external identity pr
                 auth-provider-login-hint="This is a hint"
                 auth-provider-prompt="none"
                 auth-pub-keys-src="https://login.microsoftonline.com/common/discovery/keys"
-                auth-redirect-url="https://localhost/test/oauth2login"
+                auth-redirect-url="https://intrexxserver/login/oic/authenticate"
                 auth-requires-nonce="true"
                 auth-scheme="header"
                 auth-scope="openid email"
