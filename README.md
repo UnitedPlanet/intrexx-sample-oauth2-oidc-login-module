@@ -96,7 +96,7 @@ If you are using the internal Intrexx certificate store, all of the SSL certific
 
 ### OAuth2 login button on the portal homepage
 
-So that the authentication process for logging in via an external identity provider can be initiated from Intrexx, a request needs to be made to an Intrexx servlet that is informed by a query string parameter as to which provider should be used for the login (multiple providers can be defined in the om.cfg). For testing purposes, the simplest way to do this is to add a login button to the portal login page (or another portal page). Open the file `\org\portal\internal\system\vm\html\login\logincore.vm` and insert the following line beneath the login form:
+So that the authentication process for logging in via an external identity provider can be initiated from Intrexx, a request needs to be made to an Intrexx servlet that is informed by a query string parameter as to which provider should be used for the login (multiple providers can be defined in the om.cfg). For testing purposes, the simplest way to do this is to add a login button to an Intrexx portal page:
 
 ```html
 <input class="Button_Standard" type="Button" onclick="location.href='?urn:schemas-unitedplanet-de:ixservlet:name=oAuth2LoginIxServlet&oauthProvider=azuread';" value="Login with Azure AD">
@@ -106,7 +106,7 @@ Here, modify the `oauthProvider` parameter and enter the name of the provider de
 
 You can create multiple login buttons of this type for different providers.
 
-For production systems it is highly recommended to create a custom portlet for the login button and place this on the portal start page. Otherwise the logincore.vm file could be overwritten by Intrexx updates. This repository contains an example Intrexx app with a login portlet.
+For production systems it is highly recommended to create a custom portlet for the login button and place this on the portal start page. This repository contains an example Intrexx app with a login portlet (GoogleAuthPortlet.lax).
 
 ### User login
 
