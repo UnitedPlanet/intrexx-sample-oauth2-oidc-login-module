@@ -48,43 +48,61 @@ Zum Beispiel:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-   <authentication anonymous="05CE8CE3035924F7D3088895F1D87DADD65CFAE4">
-      <binding scope="web" auth-type="IntrexxOAuth2"/>
-      <binding scope="client" auth-type="IntrexxAuth"/>
-      <binding scope="webservice" auth-type="IntrexxAuth"/>
-      <binding scope="odataservice" auth-type="ODataAuth"/>
-      <binding scope="documentintegration" auth-type="IntrexxAuth"/>
-      <webserver-configuration plain-text-auth="false" integrated-auth="false"/>
-      <mobile-devices plain-text-auth="never"/>
-   </authentication>
+    <authentication anonymous="05CE8CE3035924F7D3088895F1D87DADD65CFAE4">
+        <binding scope="web" auth-type="IntrexxOAuth2"/>
+        <binding scope="client" auth-type="IntrexxAuth"/>
+        <binding scope="webservice" auth-type="IntrexxAuth"/>
+        <binding scope="odataservice" auth-type="ODataAuth"/>
+        <binding scope="documentintegration" auth-type="IntrexxAuth"/>
+        <webserver-configuration plain-text-auth="false" integrated-auth="false"/>
+    </authentication>
+    <security/>
+    <organization default-container-guid="4B87C2470868AAB57BFB31958D1F73583FB3778E" default-distlist-guid="4B87C2470868AAB57BFB31958D1F73583FB3778E"/>
 
-   <oauth2 name="azuread">
-        <provider
-                auth-grant-type="authorization_code"
-                auth-scheme="header"
-                auth-protocol="id_token"
-                auth-requires-nonce="true"
-                auth-access-token-url="https://login.microsoftonline.com/common/oauth2/v2.0/token"
-                auth-user-auth-url="https://login.microsoftonline.com/common/oauth2/v2.0/authorize"
-                auth-user-info-url=""
-                auth-pub-keys-src="https://login.microsoftonline.com/common/discovery/v2.0/keys"
-                auth-scope="openid email"
-                auth-client-id="CLIENT_ID"
-                auth-client-secret="CLIENT_SECRET"
-                auth-redirect-url="https://intrexxserver/login/oic/authenticate"
-                auth-provider-prompt="none"
-                auth-provider-login-hint="This is a hint"
+<oauth2 name="azure">
+    <provider
+        auth-grant-type="authorization_code"
+        auth-scheme="header"
+        auth-protocol="code"
+        auth-requires-nonce="true"
+        auth-access-token-url="https://login.microsoftonline.com/<TENANT-ID>/oauth2/v2.0/token"
+        auth-user-auth-url="https://login.microsoftonline.com/<TENANT-ID>/oauth2/v2.0/authorize"
+        auth-pub-keys-src="https://login.microsoftonline.com/<TENANT-ID>/discovery/v2.0/keys"
+        auth-user-info-url="https://graph.microsoft.com/oidc/userinfo"
+        auth-scope="openid email profile"
+        auth-client-id="<CLIENT-ID>"
+        auth-client-secret="<CLIENT-SECRET>"
+        auth-redirect-url="https://localhost:1337/oauth2/login/azure"
+        auth-provider-prompt="none"
+        auth-provider-login-hint=""
         />
-        <mapping db-field-name="emailBiz" provider-claim-fieldname="email"/>
+        <mapping db-field-name="emailBiz" provider-claim-fieldname="email" enable-user-registration="true"/>
         <additional-redirect-params>
-                <redirect-param key="response_type" value="id_token"/>
+                <redirect-param key="response_type" value="code id_token"/>
                 <redirect-param key="response_mode" value="form_post"/>
         </additional-redirect-params>
    </oauth2>
 
-   <security/>
-   <organization default-container-guid="4B87C2470868AAB57BFB31958D1F73583FB3778E" default-distlist-guid="4B87C2470868AAB57BFB31958D1F73583FB3778E"/>
-</configuration>
+  <oauth2 name="keycloak">
+      <provider
+        auth-access-token-url="https://keycloak.local/auth/realms/dev/protocol/openid-connect/token"
+        auth-client-id="<CLIENT-ID>"
+        auth-client-secret="<CLIENT-SECRET>"
+        auth-grant-type="authorization_code"
+        auth-protocol="code"
+        auth-provider-login-hint="This is a hint"
+        auth-provider-prompt="none"
+        auth-pub-keys-src="https:/keycloak.local/auth/realms/dev/protocol/openid-connect/certs"
+        auth-redirect-url="https://localhost:1337/oauth2/login/keycloak"
+        auth-requires-nonce="true"
+        auth-scheme="header"
+        auth-scope="openid email"
+        auth-user-auth-url="https://keycloak.local/auth/realms/dev/protocol/openid-connect/auth"
+        auth-user-info-url="https://keycloak.local/auth/realms/dev/protocol/openid-connect/userinfo"
+        />
+        <mapping db-field-name="emailBiz" provider-claim-fieldname="email" enable-user-registration="true"/>
+    </oauth2>
+  </configuration>
 ```
 
 Ersetzen Sie darin `CLIENT_ID` und `CLIENT_SECRET` mit der Client ID, die Sie bei der Registrierung von Intrexx als App bei AzureAD erhalten haben. Des Weiteren muss die Redirect URL auf das eigene Portal angepasst werden. Anschließend muss der Portalserver neu gestartet werden.
@@ -98,10 +116,9 @@ Wenn der interne Zertifikatsspeicher von Intrexx benutzt wird, müssen alle vom 
 Damit der Authentifizierungsprozess für die Benutzeranmeldung über externen Identitätsanbieter von Intrexx aus initiiert werden kann, muss zunächst ein Request auf ein Intrexx Servlet erfolgen, dem über ein Query String Parameter mitgeteilt wird, welche Provider für die Anmeldung verwendet werden soll (in der om.cfg können mehrere Provider definiert werden). Zu Testzwecken lässt sich dazu am einfachsten eine Login Schaltfläche auf einer Portalseite einfügen:
 
 ```html
-<input class="Button_Standard" type="Button" onclick="location.href='?urn:schemas-unitedplanet-de:ixservlet:name=oAuth2LoginIxServlet&oauthProvider=azuread';" value="Anmeldung mit Azure AD">
-```
+<input class="Button_Standard" type="Button" onclick="location.href='https://localhost:1337/oauth2/authorization/azure';" value="Anmeldung mit Azure AD">
 
-Passen Sie dabei ggf. den Parameter `oauthProvider` an und tragen als Wert den Namen der Provider Definition aus der `om.cfg` ein.
+Der letzte Teil des Pfads der URL muss dabei mit dem Namen der Provider Definition aus der `om.cfg` übereinstimmen.
 
 Sie können mehrere solche Login Buttons für unterschiedliche Provider anlegen.
 
@@ -128,51 +145,6 @@ Es wird empfohlen, die Benutzerstammdaten aus dem externen Identity Provider zu 
 ### Weitere Konfigurationsbeispiele
 
 ```xml
-<oauth2 name="azurev1">
-        <provider
-                auth-access-token-url="https://login.microsoftonline.com/common/oauth2/token"
-                auth-client-id="CLIENT_ID"
-                auth-client-secret="CLIENT_SECRET"
-                auth-grant-type="authorization_code" auth-protocol="id_token"
-                auth-provider-login-hint="This is a hint"
-                auth-provider-prompt="none"
-                auth-pub-keys-src="https://login.microsoftonline.com/common/discovery/keys"
-                auth-redirect-url="https://intrexxserver/login/oic/authenticate"
-                auth-requires-nonce="true"
-                auth-scheme="header"
-                auth-scope="openid email"
-                auth-user-auth-url="https://login.microsoftonline.com/common/oauth2/authorize"
-                auth-user-info-url=""/>
-        />
-        <mapping db-field-name="emailBiz" provider-claim-fieldname="upn"/>
-        <additional-redirect-params>
-                <redirect-param key="response_type" value="id_token"/>
-                <redirect-param key="response_mode" value="form_post"/>
-        </additional-redirect-params>
-</oauth2>
-<oauth2 name="azurev2">
-        <provider
-                auth-grant-type="authorization_code"
-                auth-scheme="header"
-                auth-protocol="id_token"
-                auth-requires-nonce="true"
-                auth-access-token-url="https://login.microsoftonline.com/common/oauth2/v2.0/token"
-                auth-user-auth-url="https://login.microsoftonline.com/common/oauth2/v2.0/authorize"
-                auth-pub-keys-src="https://login.microsoftonline.com/common/discovery/v2.0/keys"
-                auth-user-info-url=""
-                auth-scope="openid email"
-                auth-client-id="CLIENT_ID"
-                auth-client-secret="CLIENT_SECRET"
-                auth-redirect-url="https://intrexxserver/login/oic/authenticate"
-                auth-provider-prompt="none"
-                auth-provider-login-hint="This is a hint"
-        />
-        <mapping db-field-name="emailBiz" provider-claim-fieldname="email"/>
-        <additional-redirect-params>
-                <redirect-param key="response_type" value="id_token"/>
-                <redirect-param key="response_mode" value="form_post"/>
-        </additional-redirect-params>
-</oauth2>
 <oauth2 name="google">
         <provider
                 auth-grant-type="authorization_code"
@@ -186,9 +158,9 @@ Es wird empfohlen, die Benutzerstammdaten aus dem externen Identity Provider zu 
                 auth-scope="openid email"
                 auth-client-id="CLIENT_ID"
                 auth-client-secret="CLIENT_SECRET"
-                auth-redirect-url="https://intrexxserver/login/oic/authenticate"
+                auth-redirect-url="https://intrexxserver/oauth2/login/google"
                 auth-provider-prompt="none"
-                auth-provider-login-hint="This is a hint"
+                auth-provider-login-hint=""
         />
         <mapping db-field-name="emailBiz" provider-claim-fieldname="email"/>
 </oauth2>
@@ -200,14 +172,14 @@ Es wird empfohlen, die Benutzerstammdaten aus dem externen Identity Provider zu 
                 auth-requires-nonce="true"
                 auth-access-token-url="https://dev-xxxxx.oktapreview.com/oauth2/default/v1/token"
                 auth-user-auth-url="https://dev-xxxxx.oktapreview.com/oauth2/default/v1/authorize"
-                auth-pub-keys-src="https://dev-xxxxx.oktapreview.com/oauth2/default/v1/keys"
+                auth-pub-keys-src="https://dev-748399.oktapreview.com/oauth2/default/v1/keys"
                 auth-user-info-url=""
                 auth-scope="openid email"
                 auth-client-id="CLIENT_ID"
                 auth-client-secret="CLIENT_SECRET"
-                auth-redirect-url="https://intrexxserver/login/oic/authenticate"
+                auth-redirect-url="https://intrexxserver/oauth2/login/okta"
                 auth-provider-prompt="none"
-                auth-provider-login-hint="This is a hint"
+                auth-provider-login-hint=""
         />
         <mapping db-field-name="emailBiz" provider-claim-fieldname="email"/>
 </oauth2>
