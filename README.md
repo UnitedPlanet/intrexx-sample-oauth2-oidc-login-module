@@ -69,7 +69,7 @@ For example:
         auth-access-token-url="https://login.microsoftonline.com/<TENANT-ID>/oauth2/v2.0/token"
         auth-user-auth-url="https://login.microsoftonline.com/<TENANT-ID>/oauth2/v2.0/authorize"
         auth-pub-keys-src="https://login.microsoftonline.com/<TENANT-ID>/discovery/v2.0/keys"
-        auth-user-info-url="https://graph.microsoft.com/oidc/userinfo"
+        auth-user-info-url=""
         auth-scope="openid email profile"
         auth-client-id="<CLIENT-ID>"
         auth-client-secret="<CLIENT-SECRET>"
@@ -215,7 +215,7 @@ Examples:
  auth_requires_nonce:  boolean [if the provider requires a nonce]
  auth_access_token_url:  string [the providers url for the token]
  auth_user_auth_url:  string [the providers url for the authorization]
- auth_user_info_url:  string [the providers url for the user info endpoint]
+ auth_user_info_url:  string [the providers url for the user info endpoint, leave this empty when user attributes are already included in OIDC ID tokens]
  auth_pub_keys_src:  string [the src of the public keys of the provider. a url in terms of AWS, AZURE, etc]
  auth_oauth2_scope:  string [the scope containing at least 'openid' and the identifier of the required claim]
  auth_oauth2_client_id:  string [the client id given by the provider]
