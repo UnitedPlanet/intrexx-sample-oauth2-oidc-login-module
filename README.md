@@ -32,6 +32,7 @@ IntrexxOAuth2
                 debug=false;
 
         de.uplanet.lucy.server.auth.module.intrexx.IntrexxLoginModule sufficient
+                de.uplanet.auth.compareClaimCaseInsensitive=true
                 de.uplanet.auth.allowEmptyPassword=true
                 debug=true;
 
@@ -86,20 +87,20 @@ For example:
 
   <oauth2 name="keycloak">
       <provider
+        auth-grant-type="authorization_code"   
+        auth-scheme="header"
+        auth-protocol="code"
+        auth-requires-nonce="true"
         auth-access-token-url="https://keycloak.local/auth/realms/dev/protocol/openid-connect/token"
+        auth-user-auth-url="https://keycloak.local/auth/realms/dev/protocol/openid-connect/auth"
+        auth-pub-keys-src="https:/keycloak.local/auth/realms/dev/protocol/openid-connect/certs"
+        auth-user-info-url="https://keycloak.local/auth/realms/dev/protocol/openid-connect/userinfo"
+        auth-scope="openid email"
         auth-client-id="<CLIENT-ID>"
         auth-client-secret="<CLIENT-SECRET>"
-        auth-grant-type="authorization_code"
-        auth-protocol="code"
-        auth-provider-login-hint="This is a hint"
-        auth-provider-prompt="none"
-        auth-pub-keys-src="https:/keycloak.local/auth/realms/dev/protocol/openid-connect/certs"
         auth-redirect-url="https://localhost:1337/oauth2/login/keycloak"
-        auth-requires-nonce="true"
-        auth-scheme="header"
-        auth-scope="openid email"
-        auth-user-auth-url="https://keycloak.local/auth/realms/dev/protocol/openid-connect/auth"
-        auth-user-info-url="https://keycloak.local/auth/realms/dev/protocol/openid-connect/userinfo"
+        auth-provider-prompt="none"
+        auth-provider-login-hint=""
         />
         <mapping db-field-name="emailBiz" provider-claim-fieldname="email" enable-user-registration="true"/>
     </oauth2>
@@ -247,10 +248,16 @@ Edit `internal/cfg/spring/00-oauth2-context.xml`:
 ```xml
     <!-- The OAuth2 login bean-->
     <bean id="defaultOAuth2Login" class="de.uplanet.lucy.server.login.OAuth2LoginBean">
+        <constructor-arg ref="portalPathProvider" />
+        <constructor-arg ref="defaultOAuth2Support" />
+        <constructor-arg ref="userManagerConfiguration" />
+        
         <!-- set to false only when in development mode, otherwise changes to the script requires portal server restart -->
-            <property name="cacheCompiledScript" value="true" />
+        <property name="cacheCompiledScript" value="true" />
+        
         <!-- internal path to the Groovy user registration script -->
         <property name="userMappingScript" value="internal/cfg/oauth2_user_registration.groovy" />
+        <!-- internal path to the Groovy user update script -->
         <property name="userUpdateScript" value="internal/cfg/oauth2_user_update.groovy"/>
     </bean>
 ```
@@ -262,48 +269,8 @@ Add a new file `internal/cfg/oauth2_user_registration.groovy`:
 
 g_syslog.info(accessTokenDetails)
 
-// Intrexx internal class ID for tenant containers
-TENANT_CLASS_ID = 12
-
 try
 {
-	//check if tenant (CompanyID) exists
-	def tenant = g_om.getOrgStructure().findContainerNode(accessTokenDetails["CompanyID"])
-
-	if (tenant) {
-		assert tenant.classId == TENANT_CLASS_ID
-	}
-	else
-	{
-		// create the tenant
-		tenant = g_om.createContainer("TENANT", {
-			container = "Tenants"  // the parent container for new tenants
-			name = accessTokenDetails["CompanyID"]
-			description = accessTokenDetails["Company"]
-			//set("CompanyID", accessTokenDetails["CompanyID"]) add custom schema attributes
-		})
-	}
-
-	// prepare the user groups from roles
-	def roles = accessTokenDetails["Roles"]
-	def ixRoles = [:]
-
-	if (roles) {
-		roles.forEach { roleValues ->
-			ixGroup = ""
-
-			// map the roles to Intrexx user groups (by name or GUID)
-			switch(roleValues["RoleType"]) {
-				case "SYSADMIN": ixGroup = "Administratoren"; break;
-				case "ADMIN": ixGroup = "Administratoren"; break;
-				case "USERS": ixGroup = "Benutzer"; break;
-				default: ixGroup = "Benutzer"
-			}
-
-			ixRoles[ixGroup] = 1
-		}
-	}
-
 	// generate a random password
 	def pwGuid = newGuid()
 	def pw = g_om.getEncryptedPassword(["password": pwGuid])
@@ -311,20 +278,17 @@ try
 	// create the new user
 	def user = g_om.createUser {
 		container     = "System" // name of the parent container for new users
-		name          =  accessTokenDetails["user"]
+		name          =  accessTokenDetails["name"]
 		password      =  pw
-		loginName     =  accessTokenDetails["user"]
+		loginName     =  accessTokenDetails["email"]
 		emailBiz      =  accessTokenDetails["email"]
 		description   = "OIDC user created at ${now().withoutFractionalSeconds}"
-		TENANT        =  tenant.guid
 
 		// a list of GUIDs or names of user groups
 		//memberOf = ["6AA80844C3C99EF93BF4536EB18605BF86FDD3C5"]
-		memberOf = ixRoles.keySet()
 	}
 
-	g_syslog.info("Created user from OIDC: ${user.loginName}/${tenant.name}")
-	g_syslog.info("User groups" + ixRoles.keySet())
+	g_syslog.info("Created user from OIDC: ${user.loginName}")
 	return true
 }
 catch (Exception e)
@@ -338,25 +302,12 @@ catch (Exception e)
 
 When the `enable-user-registration` attribute in om.cfg ist set to `true`, a further custom Groovy script can be defined to update an existing user after successful login. The user details can be accessed via the script variable `accessTokenDetails` (of type `HashMap`) along with the current Intrexx user object `ixUserRecord`. The map contains also the actual OAuth2 access token which can be used to send further HTTP requests to an external API.
 
-Edit `internal/cfg/spring/00-oauth2-context.xml`:
-
-```xml
-    <!-- The OAuth2 login bean-->
-    <bean id="defaultOAuth2Login" class="de.uplanet.lucy.server.login.OAuth2LoginBean">
-        <!-- set to false only when in development mode, otherwise changes to the script requires portal server restart -->
-            <property name="cacheCompiledScript" value="true" />
-        <!-- internal path to the Groovy user registration script -->
-        <property name="userMappingScript" value="internal/cfg/oauth2_user_registration.groovy" />
-        <property name="userUpdateScript" value="internal/cfg/oauth2_user_update.groovy"/>
-    </bean>
-```
-
 Add a new file `internal/cfg/oauth2_user_update.groovy`:
 
 ```groovy
 // log user details
-g_log.info(accessTokenDetails)
-g_log.info(accessTokenDetails["ixUserRecord"])
+g_syslog.info(accessTokenDetails)
+g_syslog.info(accessTokenDetails["ixUserRecord"])
 
 // update user/roles etc. as in registration script
 
