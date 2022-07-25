@@ -30,7 +30,7 @@ IntrexxOAuth2
 {
         de.uplanet.lucy.server.auth.module.intrexx.IntrexxOAuth2LoginModule sufficient
                 de.uplanet.auth.compareClaimCaseInsensitive=true
-                debug=false;
+                debug=true;
 
         de.uplanet.lucy.server.auth.module.intrexx.IntrexxLoginModule sufficient
                 de.uplanet.auth.allowEmptyPassword=true
