@@ -29,10 +29,10 @@ Example: OpenID Connect and Intrexx standard authentication:
 IntrexxOAuth2
 {
         de.uplanet.lucy.server.auth.module.intrexx.IntrexxOAuth2LoginModule sufficient
+                de.uplanet.auth.compareClaimCaseInsensitive=true
                 debug=false;
 
         de.uplanet.lucy.server.auth.module.intrexx.IntrexxLoginModule sufficient
-                de.uplanet.auth.compareClaimCaseInsensitive=true
                 de.uplanet.auth.allowEmptyPassword=true
                 debug=true;
 
