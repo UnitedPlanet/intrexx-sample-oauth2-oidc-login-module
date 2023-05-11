@@ -14,7 +14,7 @@ With the Intrexx OpenID Connect Login Module, Intrexx users can be authenticated
 
 ## Requirements
 
-- At least Intrexx 10.1 (steady track)
+- At least Intrexx 10.1
 
 ## Configuration
 
@@ -57,53 +57,53 @@ For example:
         <binding scope="odataservice" auth-type="ODataAuth"/>
         <binding scope="documentintegration" auth-type="IntrexxAuth"/>
         <webserver-configuration plain-text-auth="false" integrated-auth="false"/>
-    </authentication>
-    <security/>
-    <organization default-container-guid="4B87C2470868AAB57BFB31958D1F73583FB3778E" default-distlist-guid="4B87C2470868AAB57BFB31958D1F73583FB3778E"/>
 
-<oauth2 name="azure">
-    <provider
-        auth-grant-type="authorization_code"
-        auth-scheme="header"
-        auth-protocol="code"
-        auth-requires-nonce="true"
-        auth-access-token-url="https://login.microsoftonline.com/<TENANT-ID>/oauth2/v2.0/token"
-        auth-user-auth-url="https://login.microsoftonline.com/<TENANT-ID>/oauth2/v2.0/authorize"
-        auth-pub-keys-src="https://login.microsoftonline.com/<TENANT-ID>/discovery/v2.0/keys"
-        auth-user-info-url=""
-        auth-scope="openid email profile"
-        auth-client-id="<CLIENT-ID>"
-        auth-client-secret="<CLIENT-SECRET>"
-        auth-redirect-url="https://localhost:1337/oauth2/login/azure"
-        auth-provider-prompt="none"
-        auth-provider-login-hint=""
-        />
-        <mapping db-field-name="emailBiz" provider-claim-fieldname="email" enable-user-registration="true"/>
-        <additional-redirect-params>
-                <redirect-param key="response_type" value="code id_token"/>
-                <redirect-param key="response_mode" value="form_post"/>
-        </additional-redirect-params>
-   </oauth2>
+	<oauth2 name="azure">
+	    <provider
+		auth-grant-type="authorization_code"
+		auth-scheme="header"
+		auth-protocol="code"
+		auth-requires-nonce="true"
+		auth-access-token-url="https://login.microsoftonline.com/<TENANT-ID>/oauth2/v2.0/token"
+		auth-user-auth-url="https://login.microsoftonline.com/<TENANT-ID>/oauth2/v2.0/authorize"
+		auth-pub-keys-src="https://login.microsoftonline.com/<TENANT-ID>/discovery/v2.0/keys"
+		auth-user-info-url=""
+		auth-scope="openid email profile"
+		auth-client-id="<CLIENT-ID>"
+		auth-client-secret="<CLIENT-SECRET>"
+		auth-redirect-url="https://localhost:1337/oauth2/login/azure"
+		auth-provider-prompt="none"
+		auth-provider-login-hint=""
+		/>
+		<mapping db-field-name="emailBiz" provider-claim-fieldname="email" enable-user-registration="true"/>
+		<additional-redirect-params>
+			<redirect-param key="response_type" value="code id_token"/>
+			<redirect-param key="response_mode" value="form_post"/>
+		</additional-redirect-params>
+	   </oauth2>
 
-  <oauth2 name="keycloak">
-      <provider
-        auth-grant-type="authorization_code"   
-        auth-scheme="header"
-        auth-protocol="code"
-        auth-requires-nonce="true"
-        auth-access-token-url="https://keycloak.local/auth/realms/dev/protocol/openid-connect/token"
-        auth-user-auth-url="https://keycloak.local/auth/realms/dev/protocol/openid-connect/auth"
-        auth-pub-keys-src="https:/keycloak.local/auth/realms/dev/protocol/openid-connect/certs"
-        auth-user-info-url="https://keycloak.local/auth/realms/dev/protocol/openid-connect/userinfo"
-        auth-scope="openid email"
-        auth-client-id="<CLIENT-ID>"
-        auth-client-secret="<CLIENT-SECRET>"
-        auth-redirect-url="https://localhost:1337/oauth2/login/keycloak"
-        auth-provider-prompt="none"
-        auth-provider-login-hint=""
-        />
-        <mapping db-field-name="emailBiz" provider-claim-fieldname="email" enable-user-registration="true"/>
-    </oauth2>
+	  <oauth2 name="keycloak">
+	      <provider
+		auth-grant-type="authorization_code"   
+		auth-scheme="header"
+		auth-protocol="code"
+		auth-requires-nonce="true"
+		auth-access-token-url="https://keycloak.local/auth/realms/dev/protocol/openid-connect/token"
+		auth-user-auth-url="https://keycloak.local/auth/realms/dev/protocol/openid-connect/auth"
+		auth-pub-keys-src="https:/keycloak.local/auth/realms/dev/protocol/openid-connect/certs"
+		auth-user-info-url="https://keycloak.local/auth/realms/dev/protocol/openid-connect/userinfo"
+		auth-scope="openid email"
+		auth-client-id="<CLIENT-ID>"
+		auth-client-secret="<CLIENT-SECRET>"
+		auth-redirect-url="https://localhost:1337/oauth2/login/keycloak"
+		auth-provider-prompt="none"
+		auth-provider-login-hint=""
+		/>
+		<mapping db-field-name="emailBiz" provider-claim-fieldname="email" enable-user-registration="true"/>
+	    </oauth2>
+	</authentication>
+	<security/>
+    	<organization default-container-guid="4B87C2470868AAB57BFB31958D1F73583FB3778E" default-distlist-guid="4B87C2470868AAB57BFB31958D1F73583FB3778E"/>
   </configuration>
 ```
 
@@ -243,25 +243,6 @@ Edit `internal/cfg/om.cfg`:
  <mapping db-field-name="emailBiz" provider-claim-fieldname="email" enable-user-registration="true"/>
 ```
 
-Edit `internal/cfg/spring/00-oauth2-context.xml`:
-
-```xml
-    <!-- The OAuth2 login bean-->
-    <bean id="defaultOAuth2Login" class="de.uplanet.lucy.server.login.OAuth2LoginBean">
-        <constructor-arg ref="portalPathProvider" />
-        <constructor-arg ref="defaultOAuth2Support" />
-        <constructor-arg ref="userManagerConfiguration" />
-        
-        <!-- set to false only when in development mode, otherwise changes to the script requires portal server restart -->
-        <property name="cacheCompiledScript" value="true" />
-        
-        <!-- internal path to the Groovy user registration script -->
-        <property name="userMappingScript" value="internal/cfg/oauth2_user_registration.groovy" />
-        <!-- internal path to the Groovy user update script -->
-        <property name="userUpdateScript" value="internal/cfg/oauth2_user_update.groovy"/>
-    </bean>
-```
-
 Add a new file `internal/cfg/oauth2_user_registration.groovy`:
 
 ```groovy
@@ -298,7 +279,7 @@ catch (Exception e)
 }
 ```
 
-## Existing User Update
+### Existing User Update
 
 When the `enable-user-registration` attribute in om.cfg ist set to `true`, a further custom Groovy script can be defined to update an existing user after successful login. The user details can be accessed via the script variable `accessTokenDetails` (of type `HashMap`) along with the current Intrexx user object `ixUserRecord`. The map contains also the actual OAuth2 access token which can be used to send further HTTP requests to an external API.
 
@@ -312,6 +293,15 @@ g_syslog.info(accessTokenDetails["ixUserRecord"])
 // update user/roles etc. as in registration script
 
 return true
+```
+
+### Overriding settings
+
+If you need to change the script paths, create a new file `ìnternal/cfg/oauth2_context.properties` and edit these settings:
+
+```text
+defaultOAuth2Login.userMappingScript=internal/cfg/oauth2_user_registration.groovy
+defaultOAuth2Login.userUpdateScript=internal/cfg/oauth2_user_update.groovy
 ```
 
 ## Troubleshooting
