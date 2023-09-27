@@ -14,7 +14,8 @@ With the Intrexx OpenID Connect Login Module, Intrexx users can be authenticated
 
 ## Requirements
 
-- At least Intrexx 10.1
+- At least Intrexx 10.1.
+- Beginning with Intrexx 11.4.0 there is a new OAuth2 login configuration dialog in the portal manager (User managenment -> Configuration). This is the preferred way to define the required configuration instead of editing the configuration files as described below.
 
 ## Configuration
 
@@ -134,6 +135,10 @@ Once a user clicks on one of the OAuth2 login buttons on the homepage, they will
 ### User replication
 
 It is recommended to import/replicate the user data from an external identity provider. If you are using Azure AD or ADFS, this can be achieved via LDAP.
+
+### Reverse proxy configuration
+
+If a reverse proxy acts as a gateway in front of the Intrexx server the proxy must forward the following HTTP headers to the backend in order to create the correct redirect URLs to the portal after the user authenticated with the identity provider. These headers must also be marked as "allow" in the `org/portal/external/htmlroot/WEB-INF/web.xml` file.
 
 ### Links with more information
 
