@@ -140,6 +140,14 @@ It is recommended to import/replicate the user data from an external identity pr
 
 If a reverse proxy acts as a gateway in front of the Intrexx server the proxy must forward the following HTTP headers to the backend in order to create the correct redirect URLs to the portal after the user authenticated with the identity provider. These headers must also be marked as "allow" in the `org/portal/external/htmlroot/WEB-INF/web.xml` file.
 
+
+- X-Forwarded-For
+- Forwarded
+- X-Real-IP
+- X-Forwarded-Host
+- X-Forwarded-Proto
+- X-Original-URL
+
 ### Links with more information
 
 <https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc>
